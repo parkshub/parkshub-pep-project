@@ -12,13 +12,19 @@ public class AccountService {
     
     public Account insertAccount(Account account) {
         // maybe also need to add search by username to see that account doesn't exist
-        System.out.println("in service");
-        System.out.println("service received account: " + account);
+        System.out.println("\nin service");
+        System.out.println("this is account received by service from controller: " + account);
         Account checkAccount = this.accountDAO.findAccountByUsername(account.getUsername());
-        System.out.println("this is service account" + checkAccount);
+        System.out.println("this is account received by service from DAO looking for duplicates: " + checkAccount);
+        
+        if (checkAccount != null) {
+            System.out.println("check account is not null, another account with same username exists");
+            return null;
+        }
 
-        return checkAccount != null ? null : this.accountDAO.insertAccount(account);
-
-        // return this.accountDAO.insertAccount(account);
+        System.out.println("check account is null, account with same username does not exist");
+        Account addedAccount = this.accountDAO.insertAccount(account);
+        System.out.println("this is account received by service from DAO... inserting new account: " + addedAccount);
+        return addedAccount;
     }
 }

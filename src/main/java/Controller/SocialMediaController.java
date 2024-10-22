@@ -26,7 +26,7 @@ public class SocialMediaController {
     AccountService accountService;
     MessageService messageService;
 
-    public void SocialMediaController() {
+    public SocialMediaController() {
         this.accountService = new AccountService();
         this.messageService = new MessageService();
     }
@@ -55,6 +55,7 @@ public class SocialMediaController {
         Account account = mapper.readValue(ctx.body(), Account.class);
         System.out.println("this is account: " + account);
         System.out.println("this is account user name: " + account.getUsername());
+        System.out.println("this is account user id: " + account.getAccount_id());
 
         // check to see that username was inputed
         if (account.getUsername() == "") {
@@ -70,6 +71,7 @@ public class SocialMediaController {
         }
         // send the information to service
         Account addedAccount = this.accountService.insertAccount(account);
+        System.out.println("this is added account " + addedAccount);
 
         if (addedAccount == null) {
             System.out.println("here3");
