@@ -33,43 +33,51 @@ public class SocialMediaController {
 
     public Javalin startAPI() {
         Javalin app = Javalin.create();
+        System.out.println("\n\nstarting server\n\n");
         // app.get("example-endpoint", this::exampleHandler);
-        app.post("/login", this::insertAccountHandler);
+        app.post("register", this::insertAccountHandler);
+        
+        app.error(400, ctx -> {
+            ctx.status(400);
+        });
+        // app.exception(NullPointerException.class, null)
 
         return app;
     }
 
-    public void insertAccountHandler(Context ctx) throws JsonProcessingException{
+    public void insertAccountHandler(Context ctx) throws JsonProcessingException {
+
+        System.out.println("this is my print: ");
+        System.out.println(ctx.body());
 
         // first convert user input into JSON using mapper
         ObjectMapper mapper = new ObjectMapper();
         Account account = mapper.readValue(ctx.body(), Account.class);
+        System.out.println("this is account: " + account);
+        System.out.println("this is account user name: " + account.getUsername());
 
         // check to see that username was inputed
         if (account.getUsername() == "") {
-            ctx.status(400).result("Error: Username cannot be blank");
+            System.out.println("here1");
+            ctx.status(400);
+            return;
         }
         // check to see that password is at least 4 characters long
         if (account.getPassword().length() < 4) {
-            ctx.status(400).result("Error: Password must be at least 4 characters");
+            System.out.println("here2");
+            ctx.status(400);
+            return;
         }
         // send the information to service
         Account addedAccount = this.accountService.insertAccount(account);
 
-        if (addedAccount == null) { // also input something where user is not unique, but if it's something else return somemthing else
-            ctx.status(400).result("Error: Account with that username already exists");
+        if (addedAccount == null) {
+            System.out.println("here3");
+            ctx.status(400);
+            return;
         }
 
-        ctx.json(mapper.writeValueAsString(addedAccount));
+        ctx.json(mapper.writeValueAsString(addedAccount)).status(200);
+        // return;
     }
-
-    /**
-     * This is an example handler for an example endpoint.
-     * @param context The Javalin Context object manages information about both the HTTP request and response.
-     */
-    private void exampleHandler(Context context) {
-        context.json("sample text");
-    }
-
-
 }
