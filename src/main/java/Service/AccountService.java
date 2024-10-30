@@ -24,9 +24,9 @@ public class AccountService {
     public Account verifyAccountByUserName(Account account) {
         Account verifiedAccount = this.accountDAO.findAccountByUsername(account.getUsername());
 
-        // if (verifiedAccount == null) {
-        //     return null;
-        // }
+        if (verifiedAccount == null) {
+            return null;
+        }
 
         if (!verifiedAccount.getPassword().equals( account.getPassword())) {
             return null;

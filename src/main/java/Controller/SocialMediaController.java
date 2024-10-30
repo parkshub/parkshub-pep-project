@@ -8,6 +8,7 @@ import Service.AccountService;
 import Service.MessageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import java.util.*;
 
 
 
@@ -25,10 +26,12 @@ public class SocialMediaController {
 
     AccountService accountService;
     MessageService messageService;
+    ObjectMapper mapper;
 
     public SocialMediaController() {
         this.accountService = new AccountService();
         this.messageService = new MessageService();
+        this.mapper = new ObjectMapper();
     }
 
     public Javalin startAPI() {
@@ -39,6 +42,8 @@ public class SocialMediaController {
         app.post("login", this::loginAccountHandler);
         app.post("messages", this::insertMessageHandler);
         app.get("messages", this::getAllMessagesHandler);
+
+
         
         app.error(400, ctx -> {
             ctx.status(400);
@@ -54,17 +59,19 @@ public class SocialMediaController {
     public void insertAccountHandler(Context ctx) throws JsonProcessingException {
 
         // first convert user input into JSON using mapper
-        ObjectMapper mapper = new ObjectMapper();
-        Account account = mapper.readValue(ctx.body(), Account.class);
+        // ObjectMapper mapper = new ObjectMapper();
+        Account account = this.mapper.readValue(ctx.body(), Account.class);
 
         // check to see that username was inputed
         if (account.getUsername() == "") {
             ctx.status(400);
+            return;
         }
 
         // check to see that password is at least 4 characters long
         if (account.getPassword().length() < 4) {
             ctx.status(400);
+            return;
         }
 
         // send the information to service
@@ -72,15 +79,16 @@ public class SocialMediaController {
 
         if (addedAccount == null) {
             ctx.status(400);
+            return;
         }
 
-        ctx.json(mapper.writeValueAsString(addedAccount)).status(200);
+        ctx.json(this.mapper.writeValueAsString(addedAccount)).status(200);
     }
 
     public void loginAccountHandler(Context ctx) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
+        // ObjectMapper mapper = new ObjectMapper();
         
-        Account account = mapper.readValue(ctx.body(), Account.class);
+        Account account = this.mapper.readValue(ctx.body(), Account.class);
         Account verifiedAccount = this.accountService.verifyAccountByUserName(account);
 
         if (verifiedAccount == null) {
@@ -88,35 +96,39 @@ public class SocialMediaController {
             return;
         }
 
-        ctx.json(mapper.writeValueAsString(verifiedAccount)).status(200);
+        ctx.json(this.mapper.writeValueAsString(verifiedAccount)).status(200);
     }
 
     public void insertMessageHandler(Context ctx) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        Message message = mapper.readValue(ctx.body(), Message.class);
+        // ObjectMapper mapper = new ObjectMapper();
+        Message message = this.mapper.readValue(ctx.body(), Message.class);
 
 
         if (message.getMessage_text() == "" || message.getMessage_text().length() > 255) {
             ctx.status(400);
+            return;
         }
 
         Account account = this.accountService.verifyAccountById(message.getPosted_by());
 
         if (account == null) {
             ctx.status(400);
+            return;
         }
 
         Message addedMessage = this.messageService.insertMessage(message);
 
         if (addedMessage == null) {
             ctx.status(400);
+            return;
         }
         
-        ctx.json(mapper.writeValueAsString(addedMessage)).status(200);
+        ctx.json(this.mapper.writeValueAsString(addedMessage)).status(200);
     }
 
     public void getAllMessagesHandler(Context ctx) throws JsonProcessingException {
-
+        ArrayList<Message> messages = this.messageService.getAllMessages();
+        ctx.json(this.mapper.writeValueAsString(messages)).status(200);
     }
 
 }
