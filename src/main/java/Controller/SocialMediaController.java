@@ -44,8 +44,6 @@ public class SocialMediaController {
         app.get("messages", this::getAllMessagesHandler);
         app.get("messages/{message_id}", this::getMessageById);
 
-
-        
         app.error(400, ctx -> {
             ctx.status(400);
         });
@@ -58,9 +56,7 @@ public class SocialMediaController {
     }
 
     public void insertAccountHandler(Context ctx) throws JsonProcessingException {
-
         // first convert user input into JSON using mapper
-        // ObjectMapper mapper = new ObjectMapper();
         Account account = this.mapper.readValue(ctx.body(), Account.class);
 
         // check to see that username was inputed
@@ -86,9 +82,7 @@ public class SocialMediaController {
         ctx.json(this.mapper.writeValueAsString(addedAccount)).status(200);
     }
 
-    public void loginAccountHandler(Context ctx) throws JsonProcessingException {
-        // ObjectMapper mapper = new ObjectMapper();
-        
+    public void loginAccountHandler(Context ctx) throws JsonProcessingException {        
         Account account = this.mapper.readValue(ctx.body(), Account.class);
         Account verifiedAccount = this.accountService.verifyAccountByUserName(account);
 
@@ -101,9 +95,7 @@ public class SocialMediaController {
     }
 
     public void insertMessageHandler(Context ctx) throws JsonProcessingException {
-        // ObjectMapper mapper = new ObjectMapper();
         Message message = this.mapper.readValue(ctx.body(), Message.class);
-
 
         if (message.getMessage_text() == "" || message.getMessage_text().length() > 255) {
             ctx.status(400);
@@ -135,14 +127,12 @@ public class SocialMediaController {
     public void getMessageById(Context ctx) throws JsonProcessingException {
         String messageId = ctx.pathParam("message_id");
         Message message = this.messageService.getMessageById(messageId);
-        System.out.println("this is message: " + message);
         
         if (message == null) {
             ctx.json("").status(200);
-            
-        } else {
-            ctx.json(this.mapper.writeValueAsString(message)).status(200);
-        }
+            return;
+        } 
+        
+        ctx.json(this.mapper.writeValueAsString(message)).status(200);
     }
-
 }

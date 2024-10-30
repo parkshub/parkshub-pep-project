@@ -7,6 +7,7 @@ import java.util.*;
 public class MessageDAO {
     
     public Message insertMessage(Message message) {
+
         try (Connection connection = ConnectionUtil.getConnection()) {
             String sql = "insert into message (posted_by, message_text, time_posted_epoch) values(?, ?, ?);";
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -59,6 +60,7 @@ public class MessageDAO {
     }
 
     public Message getMessageById(String messageId) {
+        
         try (Connection connection = ConnectionUtil.getConnection()) {
             String sql = "select * from message where message_id = ?;";
             PreparedStatement ps = connection.prepareStatement(sql);

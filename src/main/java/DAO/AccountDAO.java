@@ -17,8 +17,12 @@ public class AccountDAO {
             ResultSet rs = ps.getGeneratedKeys();
 
             if (rs.next()) {
-                int accountId = (int) rs.getLong(1);
-                Account addedAccount = new Account(accountId, account.getUsername(), account.getPassword());
+                Account addedAccount = new Account(
+                    rs.getInt(1), 
+                    account.getUsername(), 
+                    account.getPassword()
+                );
+
                 return addedAccount;
             }
         } catch(SQLException e) {
@@ -29,10 +33,12 @@ public class AccountDAO {
     }
 
     public Account findAccountByUsername(String username) {
+
         try (Connection connection = ConnectionUtil.getConnection()) {
             String sql = "select * from account where username = ?;";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, username);
+
             ResultSet rs = ps.executeQuery();
 
             if(rs.next()) {
@@ -52,10 +58,12 @@ public class AccountDAO {
     }
 
     public Account findAccountById(int id) {
+        
         try (Connection connection = ConnectionUtil.getConnection()) {
             String sql = "select * from account where account_id = ?;";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, id);
+
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
@@ -67,8 +75,6 @@ public class AccountDAO {
 
                 return account;
             }
-
-
         } catch (Exception e) {
             e.getMessage();
         }
