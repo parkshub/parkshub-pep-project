@@ -15,13 +15,24 @@ public class MessageService {
         return insertedMessage;
     }
 
-    public ArrayList<Message> getAllMessages() {
-        return this.messageDAO.getAllMessages();
+    public ArrayList<Message> getMessages() {
+        return this.messageDAO.getMessages();
     }
 
     public Message getMessageById(String messageId) {
         Message message = this.messageDAO.getMessageById(messageId);
         return message;
     }
-    
+
+    public Message deleteMessageById(String messageId) {
+        Message message = this.messageDAO.getMessageById(messageId);
+        int row = this.messageDAO.deleteMessageById(messageId);
+
+        return message;
+    }
+
+    public ArrayList<Message> getMessagesByUser(String accountId) {
+        ArrayList<Message> messages = this.messageDAO.getMessagesByUser(accountId);
+        return messages;
+    }
 }

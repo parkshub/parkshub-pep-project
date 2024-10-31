@@ -10,6 +10,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.*;
 
+// how to send msg with status code
+// is controller supposed to be doing all of this? why I ask is because service seems to not being too much
+
+// TODO: do more edge cases
+
 
 
 /**
@@ -41,8 +46,10 @@ public class SocialMediaController {
         app.post("register", this::insertAccountHandler);
         app.post("login", this::loginAccountHandler);
         app.post("messages", this::insertMessageHandler);
-        app.get("messages", this::getAllMessagesHandler);
-        app.get("messages/{message_id}", this::getMessageById);
+        app.get("messages", this::getMessagesHandler);
+        app.get("messages/{message_id}", this::getMessageByIdHandler);
+        app.delete("messages/{message_id}", this::deleteMessageByIdHandler);
+        app.get("accounts/{account_id}/messages", this::getMessagesByUserHandler);
 
         app.error(400, ctx -> {
             ctx.status(400);
@@ -119,12 +126,12 @@ public class SocialMediaController {
         ctx.json(this.mapper.writeValueAsString(addedMessage)).status(200);
     }
 
-    public void getAllMessagesHandler(Context ctx) throws JsonProcessingException {
-        ArrayList<Message> messages = this.messageService.getAllMessages();
+    public void getMessagesHandler(Context ctx) throws JsonProcessingException {
+        ArrayList<Message> messages = this.messageService.getMessages();
         ctx.json(this.mapper.writeValueAsString(messages)).status(200);
     }
 
-    public void getMessageById(Context ctx) throws JsonProcessingException {
+    public void getMessageByIdHandler(Context ctx) throws JsonProcessingException {
         String messageId = ctx.pathParam("message_id");
         Message message = this.messageService.getMessageById(messageId);
         
@@ -134,5 +141,26 @@ public class SocialMediaController {
         } 
         
         ctx.json(this.mapper.writeValueAsString(message)).status(200);
+    }
+
+    public void deleteMessageByIdHandler(Context ctx) throws JsonProcessingException {
+        System.out.println("its here");
+        String messageId = ctx.pathParam("message_id");
+        Message message = this.messageService.deleteMessageById(messageId);
+
+        if (message == null) {
+            ctx.json("").status(200);
+            return;
+        }
+
+        ctx.json(mapper.writeValueAsString(message)).status(200);
+    }
+
+    public void getMessagesByUserHandler(Context ctx) throws JsonProcessingException {
+        String accountId = ctx.pathParam("account_id");
+        System.out.println("this is account id" + accountId);
+        ArrayList<Message> messages = this.messageService.getMessagesByUser(accountId);
+        
+        ctx.json(this.mapper.writeValueAsString(messages)).status(200);
     }
 }

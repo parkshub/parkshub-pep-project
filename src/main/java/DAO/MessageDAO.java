@@ -34,7 +34,7 @@ public class MessageDAO {
         return null;
     }
 
-    public ArrayList<Message> getAllMessages() {
+    public ArrayList<Message> getMessages() {
         ArrayList<Message> messages = new ArrayList<>();
 
         try (Connection connection = ConnectionUtil.getConnection()) {
@@ -84,5 +84,50 @@ public class MessageDAO {
         }
 
         return null;
+    }
+
+    public int deleteMessageById(String messageId) {
+        
+        try (Connection connection = ConnectionUtil.getConnection()) {
+            String sql = "delete from message where message_id = ?;";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, Integer.parseInt(messageId));
+            
+            int row = ps.executeUpdate();
+
+            return row;
+            
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return 0;
+    }
+
+    public ArrayList<Message> getMessagesByUser(String accountId) {
+        ArrayList<Message> messages = new ArrayList<>();
+
+        try (Connection connection = ConnectionUtil.getConnection()) {
+            String sql = "select * from message where posted_by = ?";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, Integer.parseInt(accountId));
+
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()) {
+                Message message = new Message(
+                    rs.getInt("message_id"),
+                    rs.getInt("posted_by"),
+                    rs.getString("message_text"),
+                    rs.getLong("time_posted_epoch")
+                );
+
+                messages.add(message);
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return messages;
     }
 }
