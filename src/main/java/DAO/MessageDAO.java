@@ -130,4 +130,27 @@ public class MessageDAO {
 
         return messages;
     }
+
+    public Message patchMessage(String newMessageText, Message oldMessage) {
+        try (Connection connection = ConnectionUtil.getConnection()) {
+            String sql = "update message set message_text = ? where message_id = ?;";
+            PreparedStatement ps = connection.prepareStatement(sql);
+
+            ps.setString(1, newMessageText);
+            ps.setInt(2, oldMessage.getMessage_id());
+
+            ps.executeUpdate();
+
+            return new Message(
+                oldMessage.getMessage_id(),
+                oldMessage.getPosted_by(),
+                newMessageText,
+                oldMessage.getTime_posted_epoch()
+            );
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
 }

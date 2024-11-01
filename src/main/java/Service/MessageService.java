@@ -35,4 +35,10 @@ public class MessageService {
         ArrayList<Message> messages = this.messageDAO.getMessagesByUser(accountId);
         return messages;
     }
+
+    public Message patchMessage(String messageId, String newMessageText) {
+        Message oldMessage = this.messageDAO.getMessageById(messageId);
+        Message patchedMessage = this.messageDAO.patchMessage(newMessageText, oldMessage);
+        return patchedMessage;
+    }
 }

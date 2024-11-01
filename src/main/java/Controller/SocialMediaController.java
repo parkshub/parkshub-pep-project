@@ -50,6 +50,7 @@ public class SocialMediaController {
         app.get("messages/{message_id}", this::getMessageByIdHandler);
         app.delete("messages/{message_id}", this::deleteMessageByIdHandler);
         app.get("accounts/{account_id}/messages", this::getMessagesByUserHandler);
+        app.patch("messages/{message_id}", this::patchMessageHandler);
 
         app.error(400, ctx -> {
             ctx.status(400);
@@ -144,7 +145,6 @@ public class SocialMediaController {
     }
 
     public void deleteMessageByIdHandler(Context ctx) throws JsonProcessingException {
-        System.out.println("its here");
         String messageId = ctx.pathParam("message_id");
         Message message = this.messageService.deleteMessageById(messageId);
 
@@ -158,9 +158,29 @@ public class SocialMediaController {
 
     public void getMessagesByUserHandler(Context ctx) throws JsonProcessingException {
         String accountId = ctx.pathParam("account_id");
-        System.out.println("this is account id" + accountId);
         ArrayList<Message> messages = this.messageService.getMessagesByUser(accountId);
         
         ctx.json(this.mapper.writeValueAsString(messages)).status(200);
+    }
+
+    public void patchMessageHandler(Context ctx) throws JsonProcessingException {
+        String messageId = ctx.pathParam("message_id");
+        String newMessageText = this.mapper.readValue(ctx.body(), Message.class).getMessage_text();
+
+        if (newMessageText == "" || newMessageText.length() > 255) {
+            ctx.json("").status(400);
+            return;
+        }
+
+        if (this.messageService.getMessageById(messageId) == null) {
+            ctx.json("").status(400);
+            return;
+        }
+
+        Message patchedMessage = this.messageService.patchMessage(messageId, newMessageText);
+        System.out.println("this is patched message: " + patchedMessage);
+
+        ctx.json(this.mapper.writeValueAsString(patchedMessage)).status(200);
+
     }
 }
