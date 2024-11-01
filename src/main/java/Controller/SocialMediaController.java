@@ -10,12 +10,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.*;
 
-// how to send msg with status code
-// is controller supposed to be doing all of this? why I ask is because service seems to not being too much
-
-// TODO: do more edge cases
-
-
 
 /**
  * TODO: You will need to write your own endpoints and handlers for your controller. The endpoints you will need can be
@@ -64,22 +58,18 @@ public class SocialMediaController {
     }
 
     public void insertAccountHandler(Context ctx) throws JsonProcessingException {
-        // first convert user input into JSON using mapper
         Account account = this.mapper.readValue(ctx.body(), Account.class);
 
-        // check to see that username was inputed
         if (account.getUsername() == "") {
             ctx.status(400);
             return;
         }
 
-        // check to see that password is at least 4 characters long
         if (account.getPassword().length() < 4) {
             ctx.status(400);
             return;
         }
 
-        // send the information to service
         Account addedAccount = this.accountService.insertAccount(account);
 
         if (addedAccount == null) {
@@ -178,9 +168,7 @@ public class SocialMediaController {
         }
 
         Message patchedMessage = this.messageService.patchMessage(messageId, newMessageText);
-        System.out.println("this is patched message: " + patchedMessage);
 
         ctx.json(this.mapper.writeValueAsString(patchedMessage)).status(200);
-
     }
 }

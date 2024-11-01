@@ -8,8 +8,8 @@ public class AccountDAO {
 
         try(Connection connection = ConnectionUtil.getConnection()) {
             String sql = "insert into account (username, password) values (?, ?);";
-            
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            
             ps.setString(1, account.getUsername());
             ps.setString(2, account.getPassword());
             ps.executeUpdate();
@@ -37,6 +37,7 @@ public class AccountDAO {
         try (Connection connection = ConnectionUtil.getConnection()) {
             String sql = "select * from account where username = ?;";
             PreparedStatement ps = connection.prepareStatement(sql);
+
             ps.setString(1, username);
 
             ResultSet rs = ps.executeQuery();
@@ -59,9 +60,11 @@ public class AccountDAO {
 
     public Account findAccountById(int id) {
         
+
         try (Connection connection = ConnectionUtil.getConnection()) {
             String sql = "select * from account where account_id = ?;";
             PreparedStatement ps = connection.prepareStatement(sql);
+
             ps.setInt(1, id);
 
             ResultSet rs = ps.executeQuery();

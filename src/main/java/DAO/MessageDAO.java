@@ -11,6 +11,7 @@ public class MessageDAO {
         try (Connection connection = ConnectionUtil.getConnection()) {
             String sql = "insert into message (posted_by, message_text, time_posted_epoch) values(?, ?, ?);";
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            
             ps.setInt(1, message.getPosted_by());
             ps.setString(2, message.getMessage_text());
             ps.setLong(3, message.getTime_posted_epoch());
@@ -40,6 +41,7 @@ public class MessageDAO {
         try (Connection connection = ConnectionUtil.getConnection()) {
             String sql = "select * from message";
             Statement st = connection.createStatement();
+
             ResultSet rs = st.executeQuery(sql);
 
             while(rs.next()) {
@@ -64,6 +66,7 @@ public class MessageDAO {
         try (Connection connection = ConnectionUtil.getConnection()) {
             String sql = "select * from message where message_id = ?;";
             PreparedStatement ps = connection.prepareStatement(sql);
+
             ps.setInt(1, Integer.parseInt(messageId));
             
             ResultSet rs = ps.executeQuery();
@@ -91,6 +94,7 @@ public class MessageDAO {
         try (Connection connection = ConnectionUtil.getConnection()) {
             String sql = "delete from message where message_id = ?;";
             PreparedStatement ps = connection.prepareStatement(sql);
+
             ps.setInt(1, Integer.parseInt(messageId));
             
             int row = ps.executeUpdate();
@@ -110,6 +114,7 @@ public class MessageDAO {
         try (Connection connection = ConnectionUtil.getConnection()) {
             String sql = "select * from message where posted_by = ?";
             PreparedStatement ps = connection.prepareStatement(sql);
+
             ps.setInt(1, Integer.parseInt(accountId));
 
             ResultSet rs = ps.executeQuery();
